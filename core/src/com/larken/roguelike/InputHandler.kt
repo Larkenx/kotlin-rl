@@ -1,13 +1,11 @@
 package com.larken.roguelike
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.Color
 import com.larken.roguelike.map.Vector
 import ktx.app.KtxInputAdapter
 
 
-class InputHandler : KtxInputAdapter {
-    val selector = Vector(0, 0)
+class InputHandler (val game: Game) : KtxInputAdapter  {
     val up = Vector(0, -1)
     val down = Vector(0, 1)
     val left = Vector(-1, 0)
@@ -18,21 +16,25 @@ class InputHandler : KtxInputAdapter {
     val lr = Vector(1, 1)
 
     override fun keyUp(keycode: Int): Boolean {
+        var playerPosition: Vector = game.player.pos
+        var newPosition = Vector(playerPosition.x, playerPosition.y)
         when (keycode) {
-            Input.Keys.W -> selector.add(up)
-            Input.Keys.S -> selector.add(down)
-            Input.Keys.A -> selector.add(left)
-            Input.Keys.D -> selector.add(right)
+            Input.Keys.W -> newPosition.add(up)
+            Input.Keys.S -> newPosition.add(down)
+            Input.Keys.A -> newPosition.add(left)
+            Input.Keys.D -> newPosition.add(right)
             // VIM keys
-            Input.Keys.K -> selector.add(up)
-            Input.Keys.J -> selector.add(down)
-            Input.Keys.H -> selector.add(left)
-            Input.Keys.L -> selector.add(right)
-            Input.Keys.Y -> selector.add(ul)
-            Input.Keys.U -> selector.add(ur)
-            Input.Keys.B -> selector.add(ll)
-            Input.Keys.N -> selector.add(lr)
+            Input.Keys.K -> newPosition.add(up)
+            Input.Keys.J -> newPosition.add(down)
+            Input.Keys.H -> newPosition.add(left)
+            Input.Keys.L -> newPosition.add(right)
+            Input.Keys.Y -> newPosition.add(ul)
+            Input.Keys.U -> newPosition.add(ur)
+            Input.Keys.B -> newPosition.add(ll)
+            Input.Keys.N -> newPosition.add(lr)
         }
+        if (newPosition.x != playerPosition.x || newPosition.y != playerPosition.y)
+        game.moveEntity(game.player, newPosition.x, newPosition.y)
         return true
     }
 }

@@ -1,14 +1,28 @@
 package com.larken.roguelike.map
 
+import com.badlogic.gdx.graphics.Color
+import com.halfdeadgames.kterminal.KTerminalGlyph
 import com.larken.roguelike.actors.Entity
 
-data class Glyph(val character: String, val foreground: String, val background: String = "transparent")
-data class Obstacle(val glyph: Glyph, val name: String, val walkable: Boolean)
+data class Obstacle(val glyph: KTerminalGlyph, val name: String, val walkable: Boolean)
+
+val wall: Obstacle = Obstacle(
+        KTerminalGlyph('#', Color.LIGHT_GRAY, Color.BLACK),
+        "Wall",
+        false
+)
+
+val floor: Obstacle = Obstacle(
+        KTerminalGlyph('.', Color.BROWN, Color.BLACK),
+        "Floor",
+        true
+)
 
 class Tile(val x: Int, val y: Int) {
     val entities: ArrayList<Entity> = ArrayList<Entity>()
     val obstacles: ArrayList<Obstacle> = ArrayList<Obstacle>()
 
+    val blocked: Boolean get() = obstacles.any {o -> !o.walkable}
     fun addObstacle(obstacle: Obstacle) {
         obstacles.add(obstacle)
     }
@@ -17,7 +31,8 @@ class Tile(val x: Int, val y: Int) {
         entities.add(entity)
     }
 
-    fun removeActor(entity: Entity) {
+    fun removeEntity(entity: Entity) {
+        println("Removing entity '${entity.name}' from tile at ($x, $y)")
         entities.remove(entity)
     }
 
@@ -28,6 +43,7 @@ class Tile(val x: Int, val y: Int) {
 
 class GameMap(val width: Int, val height: Int) {
     val data: ArrayList<ArrayList<Tile>> = ArrayList<ArrayList<Tile>>()
+
     init {
         for (y in 0..height) {
             val row: ArrayList<Tile> = ArrayList<Tile>()
@@ -38,11 +54,12 @@ class GameMap(val width: Int, val height: Int) {
         }
     }
 
-    val actors: ArrayList<Entity> get() {
-        val allEntities: ArrayList<Entity> = ArrayList<Entity>()
-        data.forEach {row -> row.forEach { tile -> allEntities.addAll(tile.entities)}}
-        return allEntities
-    }
+    val actors: ArrayList<Entity>
+        get() {
+            val allEntities: ArrayList<Entity> = ArrayList<Entity>()
+            data.forEach { row -> row.forEach { tile -> allEntities.addAll(tile.entities) } }
+            return allEntities
+        }
 
     fun tileAt(x: Int, y: Int): Tile {
         return data.get(y).get(x)
@@ -51,7 +68,10 @@ class GameMap(val width: Int, val height: Int) {
     fun print() {
         for (row in data) {
             for (tile in row) {
-                print(tile.obstacles.get(0).glyph.character)
+                if (tile.obstacles.size > 0)
+                    print(tile.obstacles.get(0).glyph.char)
+                else
+                    print(" ")
             }
             print("\n")
         }
@@ -63,17 +83,9 @@ class GameMap(val width: Int, val height: Int) {
             for (x in 0..width) {
                 val tile = tileAt(x, y)
                 if (x == 0 || y == 0 || x == width || y == height) {
-                    tile.addObstacle(Obstacle(
-                            Glyph("#", "white"),
-                            "Wall",
-                            false
-                    ))
+                    tile.addObstacle(wall)
                 } else {
-                    tile.addObstacle(Obstacle(
-                            Glyph(".", "brown"),
-                            "Floor",
-                            true
-                    ))
+                    tile.addObstacle(floor)
                 }
             }
         }

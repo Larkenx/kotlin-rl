@@ -49,6 +49,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
         compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
         compile 'com.github.heatherhaks:kterminal:-SNAPSHOT'
+        compile 'com.squidpony:squidlib-util:3.0.0-b9'
     }
 }
 
@@ -62,6 +63,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
         compile 'com.github.heatherhaks:kterminal:-SNAPSHOT'
+        compile 'com.squidpony:squidlib-util:3.0.0-b9'
     }
 }
 
