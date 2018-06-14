@@ -1,4 +1,4 @@
-package com.larken.roguelike
+package com.larken.roguelike.constants
 
 const val TITLE: String = "Kotlin Roguelike"
 const val VERSION: Float = 0.1f

@@ -3,10 +3,12 @@ package com.larken.roguelike
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.halfdeadgames.kterminal.KTerminalData
 import com.halfdeadgames.kterminal.KTerminalRenderer
+import com.larken.roguelike.map.GameMap
+import com.larken.roguelike.map.Glyph
+import com.larken.roguelike.map.Obstacle
 import ktx.app.clearScreen
 import ktx.app.use
 
@@ -15,14 +17,20 @@ class Game : ApplicationAdapter() {
     lateinit var terminalData: KTerminalData
     lateinit var terminalRenderer: KTerminalRenderer
     val inputAdapter: InputHandler = InputHandler()
+    lateinit var gameMap: GameMap
 
     override
     fun create() {
+        val width: Int = 50
+        val height: Int = 26
         spriteBatch = SpriteBatch()
-        terminalData = KTerminalData(50, 26, Color.WHITE, Color.BLACK)
+        terminalData = KTerminalData(width, height, Color.WHITE, Color.BLACK)
         terminalRenderer = KTerminalRenderer("fontSheet.png", 1f, spriteBatch)
         Gdx.input.inputProcessor = inputAdapter
         inputAdapter.selector.set(25, 13) // set position to be center of the screen
+        gameMap = GameMap(width-1, height-1)
+        gameMap.addBox()
+        gameMap.print()
     }
 
     override
@@ -38,17 +46,13 @@ class Game : ApplicationAdapter() {
 
     fun drawGame() {
         terminalData.resetCursor()
-        terminalData[0,0].drawBox(
-                width = 50,
-                height = 26,
-                topRight = KTerminalData.BOX_DOUBLE_DOWN_LEFT,
-                bottomLeft = KTerminalData.BOX_DOUBLE_UP_RIGHT,
-                bottomRight = KTerminalData.BOX_DOUBLE_UP_LEFT,
-                topLeft = KTerminalData.BOX_DOUBLE_DOWN_RIGHT,
-                horizontal = KTerminalData.BOX_DOUBLE_HORIZONTAL,
-                vertical = KTerminalData.BOX_DOUBLE_VERTICAL
-        )
-        terminalData[1, 1].write("Hello world, it's raining!")
+        for (y in 0..gameMap.height) {
+            for (x in 0..gameMap.width) {
+                val glyph = gameMap.tileAt(x, y).obstacles.get(0).glyph
+//                println("Writing " + glyph.character + " at " + x.toString() + "," + y.toString())
+                terminalData[x, y].write(glyph.character)
+            }
+        }
         val (x, y) = inputAdapter.selector
         terminalData[x, y].write('@')
 

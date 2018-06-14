@@ -3,7 +3,7 @@ package com.larken.roguelike.desktop
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.larken.roguelike.Game
-import com.larken.roguelike.*
+import com.larken.roguelike.constants.*
 
 class DesktopLauncher {
     fun main() {

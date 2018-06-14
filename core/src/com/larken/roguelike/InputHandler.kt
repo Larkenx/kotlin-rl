@@ -2,28 +2,9 @@ package com.larken.roguelike
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import com.larken.roguelike.map.Vector
 import ktx.app.KtxInputAdapter
 
-class Vector(var x: Int, var y: Int) {
-    operator fun component1(): Int {
-        return x
-    }
-
-    operator fun component2(): Int {
-        return y
-    }
-
-    fun add(v: Vector) {
-        val (dx, dy) = v
-        x += dx
-        y += dy
-    }
-
-    fun set(nx: Int, ny: Int) {
-        x = nx
-        y = ny
-    }
-}
 
 class InputHandler : KtxInputAdapter {
     val selector = Vector(0, 0)
