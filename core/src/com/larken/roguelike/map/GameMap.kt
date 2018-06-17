@@ -3,6 +3,7 @@ package com.larken.roguelike.map
 import com.badlogic.gdx.graphics.Color
 import com.halfdeadgames.kterminal.KTerminalGlyph
 import com.larken.roguelike.actors.Entity
+import squidpony.squidgrid.mapping.*
 
 data class Obstacle(val glyph: KTerminalGlyph, val name: String, val walkable: Boolean)
 
@@ -18,6 +19,8 @@ val floor: Obstacle = Obstacle(
         true
 )
 
+
+
 class Tile(val x: Int, val y: Int) {
     val entities: ArrayList<Entity> = ArrayList<Entity>()
     val obstacles: ArrayList<Obstacle> = ArrayList<Obstacle>()
@@ -32,7 +35,6 @@ class Tile(val x: Int, val y: Int) {
     }
 
     fun removeEntity(entity: Entity) {
-        println("Removing entity '${entity.name}' from tile at ($x, $y)")
         entities.remove(entity)
     }
 
@@ -43,6 +45,8 @@ class Tile(val x: Int, val y: Int) {
 
 class GameMap(val width: Int, val height: Int) {
     val data: ArrayList<ArrayList<Tile>> = ArrayList<ArrayList<Tile>>()
+
+    val tiles: ArrayList<Tile> get() = ArrayList(data.flatten())
 
     init {
         for (y in 0..height) {
@@ -90,4 +94,43 @@ class GameMap(val width: Int, val height: Int) {
             }
         }
     }
+
+    fun generateRogueDungeon() {
+        val mapGenerator: ClassicRogueMapGenerator = ClassicRogueMapGenerator(4, 5, width, height, 5, 10, 5, 10)
+        val generatedMap: Array<CharArray> = mapGenerator.generate()
+        println(generatedMap.size)
+        println(generatedMap[0].size)
+
+        var playerNotPlaced: Boolean = true
+        for (y in 0..height - 1) {
+            for (x in 0..width - 1) {
+                val character: Char = generatedMap.get(y).get(x)
+                if (character == '#') {
+                    tileAt(x, y).addObstacle(wall)
+                } else {
+                    tileAt(x, y).addObstacle(floor)
+                }
+            }
+        }
+    }
+
+    fun pacMazeDungeon() {
+        val mapGenerator: PacMazeGenerator = PacMazeGenerator(width, height)
+        val generatedMap: Array<CharArray> = mapGenerator.generate()
+        println(generatedMap.size)
+        println(generatedMap[0].size)
+
+        var playerNotPlaced: Boolean = true
+        for (y in 0..height - 1) {
+            for (x in 0..width - 1) {
+                val character: Char = generatedMap.get(y).get(x)
+                if (character == '#') {
+                    tileAt(x, y).addObstacle(wall)
+                } else {
+                    tileAt(x, y).addObstacle(floor)
+                }
+            }
+        }
+    }
+
 }

@@ -10,11 +10,8 @@ import com.halfdeadgames.kterminal.KTerminalRenderer
 import com.larken.roguelike.actors.Entity
 import com.larken.roguelike.map.GameMap
 import com.larken.roguelike.map.Tile
-import com.larken.roguelike.map.floor
-import com.larken.roguelike.map.wall
 import ktx.app.clearScreen
 import ktx.app.use
-import squidpony.squidgrid.mapping.ClassicRogueMapGenerator
 
 class Scheduler {
     val actors: ArrayList<Entity> = ArrayList<Entity>()
@@ -39,6 +36,7 @@ class Game : ApplicationAdapter() {
     lateinit var player: Entity
     var width = 50
     var height = 26
+    var mapGenerationAttempts = 0
 
     fun tileAt(x: Int, y: Int): Tile {
         return gameMap.tileAt(x, y)
@@ -56,29 +54,27 @@ class Game : ApplicationAdapter() {
         val mapWidth = 100
         val mapHeight = 100
         gameMap = GameMap(mapWidth, mapHeight)
-        val mapGenerator: ClassicRogueMapGenerator = ClassicRogueMapGenerator(4, 5, mapWidth, mapHeight, 5, 10, 5, 10)
-        val generatedMap: Array<CharArray> = mapGenerator.generate()
-        println(generatedMap.size)
-        println(generatedMap[0].size)
+        gameMap.pacMazeDungeon()
+        placePlayerOnMap()
+    }
 
-        var playerNotPlaced: Boolean = true
-        for (y in 0..gameMap.height - 1) {
-            for (x in 0..gameMap.width - 1) {
-                val character: Char = generatedMap.get(y).get(x)
-                if (character == '#') {
-                    tileAt(x, y).addObstacle(wall)
-                } else {
-                    tileAt(x, y).addObstacle(floor)
-                    if (playerNotPlaced) {
-                        /* Create player */
-                        player = Entity(x, y, "Larken", KTerminalGlyph('@', Color.CYAN, Color.BLACK))
-                        tileAt(x, y).addEntity(player)
-                        playerNotPlaced = false
-                    }
-                }
+    fun placePlayerOnMap() {
+        val possibleTiles = gameMap.tiles.filter { t -> ! t.blocked && t.x < gameMap.width / 4 }
+        if (possibleTiles.size > 0) {
+            val tile = possibleTiles.get(0)
+            val x = tile.x
+            val y = tile.y
+            /* Create player */
+            player = Entity(x, y, "Larken", KTerminalGlyph('@', Color.CYAN, Color.BLACK))
+            tileAt(x, y).addEntity(player)
+        } else {
+            if (mapGenerationAttempts >= 10) {
+                throw Exception("Could not generate a map with a free place to put the player!")
             }
+            // try regenerating the map again
+            mapGenerationAttempts++
+            this.create()
         }
-
     }
 
 
@@ -93,8 +89,8 @@ class Game : ApplicationAdapter() {
 
     }
 
-    /*
-    		let camera = {
+/*
+        let camera = {
 			// camera x,y resides in the upper left corner
 			x: Game.player.x - ~~(Game.width / 2),
 			y: Game.player.y - ~~(Game.height / 2),
@@ -120,7 +116,7 @@ class Game : ApplicationAdapter() {
 		}
 		let endingPos = [startingPos[0] + camera.width, startingPos[1] + camera.height]
 
-     */
+ */
 
     fun drawGame() {
         terminalData.resetCursor()
@@ -170,6 +166,7 @@ class Game : ApplicationAdapter() {
                 previousTile.removeEntity(entity)
                 entity.moveTo(x, y)
                 targetTile.addEntity(entity)
+                println("Moving player to $x,$y")
             }
         }
     }

@@ -17,13 +17,14 @@ class InputHandler (val game: Game) : KtxInputAdapter  {
 
     override fun keyUp(keycode: Int): Boolean {
         var playerPosition: Vector = game.player.pos
+
         var newPosition = Vector(playerPosition.x, playerPosition.y)
         when (keycode) {
             Input.Keys.W -> newPosition.add(up)
             Input.Keys.S -> newPosition.add(down)
             Input.Keys.A -> newPosition.add(left)
             Input.Keys.D -> newPosition.add(right)
-            // VIM keys
+        // VIM keys
             Input.Keys.K -> newPosition.add(up)
             Input.Keys.J -> newPosition.add(down)
             Input.Keys.H -> newPosition.add(left)
@@ -34,7 +35,7 @@ class InputHandler (val game: Game) : KtxInputAdapter  {
             Input.Keys.N -> newPosition.add(lr)
         }
         if (newPosition.x != playerPosition.x || newPosition.y != playerPosition.y)
-        game.moveEntity(game.player, newPosition.x, newPosition.y)
+            game.moveEntity(game.player, newPosition.x, newPosition.y)
         return true
     }
 }
