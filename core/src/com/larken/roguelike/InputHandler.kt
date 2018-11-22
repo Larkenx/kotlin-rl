@@ -4,7 +4,6 @@ import com.badlogic.gdx.Input
 import com.larken.roguelike.map.Vector
 import ktx.app.KtxInputAdapter
 
-
 class InputHandler (val game: Game) : KtxInputAdapter  {
     val up = Vector(0, -1)
     val down = Vector(0, 1)
